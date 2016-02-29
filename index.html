@@ -63,6 +63,7 @@
             <div data-ng-show="fc.face == face">SELECTED</div>
         </div>   
         <div></div>
+        <img style="float:right; width: 200px;" data-ng-src="{{fc.url}}" data-ng-show="fc.url"/>
         <div class='person' data-ng-class="{found:(fc.foundperson == person.personId)}"data-ng-repeat="person in fc.persons" data-ng-click="fc.person = person">
             <div>{{person.name}}</div>
             <div>{{person.personId}}</div>
@@ -89,7 +90,9 @@
             <button data-ng-disabled="!fc.faceUrl" data-ng-click="fc.detectAndCheck()">Check</button>
             <input data-ng-model="fc.faceUrl" placeholder="URL"/>
         </div>
-        
+        <h3>REQUEST</h3>
+        <pre id="request"></pre>
+        <h3>RESPONSE</h3>
         <pre id="response"></pre>
     </body>
 </html>

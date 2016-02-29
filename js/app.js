@@ -1,7 +1,7 @@
 angular.module('faceAPI', [])
-    .controller('FaceController', function($http) {
-        console.log('$http',$http);
+    .controller('FaceController', function($scope, $http) {
         var fc = this;
+        var usehttp = false;
         var API_KEYS = {
             'PROJECT_OXFORD':{
                 primary:'f957d4e5b4e64684bd57ee15b36d394e',
@@ -31,10 +31,13 @@ angular.module('faceAPI', [])
         }
         
         fc.getFace = function (personId,faceId) {
+            fc.url = null;
             makeApiCall('persongroups/1/persons/'+personId+'/persistedFaces/'+faceId,'GET','',function (res) {
                 console.log('got face', res);
+                if (res.userData) {
+                    fc.url = res.userData.split(",")[1];
+                }
             })
-            
         }
         
         
@@ -81,6 +84,7 @@ angular.module('faceAPI', [])
         }
         
          fc.detectAndCheck = function () {
+             fc.foundperson = null;
             console.log('detecting face');
             if (!fc.faceUrl) {
                 fc.error = 'ADD A FACE URL';
@@ -117,7 +121,7 @@ angular.module('faceAPI', [])
         function makeApiCall(api,method,data,callback) {
             if (!api) api = '';
             fc.error = '';
-            $http({
+            var callParams = {
                 url: 'https://api.projectoxford.ai/face/v1.0/'+api,
                 method: method || 'GET',
                 responseType: "json",
@@ -126,14 +130,31 @@ angular.module('faceAPI', [])
                 },
                 contentType: "application/json",
                 data: data
-            })
-            .then(function successCallback(response) {
-                 $('#response').append(JSON.stringify(response.data,null,2));
-                    if (callback) callback(response.data);
-            }, function errorCallback(error) {
-                console.log(error);
-                 fc.error = error.data.error;
-            });
+
+            }
+            $('#request').text(JSON.stringify(callParams,null,2));
+            if (usehttp) {                 
+                $http(callParams)
+                .then(function successCallback(response) {
+                    $('#response').append(JSON.stringify(response.data,null,2));
+                        if (callback) callback(response.data);
+                }, function errorCallback(error) {
+                    console.log(error);
+                    fc.error = error.data.error;
+                });
+            
+            } else {
+                $.ajax(callParams)
+                .done(function successCallback(response) {
+                    $('#response').text(JSON.stringify(response,null,2));
+                        if (callback) callback(response);
+                    $scope.$apply();
+                }).fail(function errorCallback(error) {
+                    console.log(error);
+                    fc.error = error.responseJSON.code + " " + error.responseJSON.message;
+                    $scope.$apply();
+                });
+            }
         }
         
         makeApiCall('persongroups/1/');
