@@ -1,3 +1,5 @@
+
+
 angular.module('faceAPI', [])
     .controller('FaceController', function($scope, $http) {
         var fc = this;
@@ -8,6 +10,17 @@ angular.module('faceAPI', [])
                 secondary: 'c1a80b2c359a49338619f8f71afacd5e'
             }
         }
+        
+        $.getScript( "js/facerec.js", function( data, textStatus, jqxhr ) {
+            console.log( data ); // Data returned
+            console.log( textStatus ); // Success
+            console.log( jqxhr.status ); // 200
+            console.log( "Load was performed." );
+            fc.fr = new roco.FaceRecognition(null,'f957d4e5b4e64684bd57ee15b36d394e');
+        });
+        
+        
+        
         
         fc.createPerson = function () {
             console.log('creating person');
@@ -31,11 +44,13 @@ angular.module('faceAPI', [])
         }
         
         fc.getFace = function (personId,faceId) {
+            console.log('fc',fc);
             fc.url = null;
-            makeApiCall('persongroups/1/persons/'+personId+'/persistedFaces/'+faceId,'GET','',function (res) {
+            fc.fr.getFace(personId,faceId,function (res) {
                 console.log('got face', res);
                 if (res.userData) {
                     fc.url = res.userData.split(",")[1];
+                    $scope.$apply();
                 }
             })
         }
@@ -161,3 +176,6 @@ angular.module('faceAPI', [])
         fc.getPersons();
         //fc.getFaces();
     });
+    
+    
+
