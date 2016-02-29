@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html ng-app="faceAPI">
+    <head>
+        <meta charset="UTF-8">
+        <title>Face++ JavaScript SDK</title>
+        <script type="text/javascript" src="lib/js/jquery-2.2.1.min.js"></script>
+        <script type="text/javascript" src="lib/js/angular.min.js"></script>
+        <script type="text/javascript" src="js/app.js"></script>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif; 
+            }
+            
+            div {
+                margin: 5px;
+            }
+            
+            h4 {
+                color: red;
+                
+            }
+            
+            .person {
+                width: 100px;
+                height: 140px;
+                display: inline-block;
+                border: 1px solid slategrey;
+                font-size: 10px;
+                overflow: hidden;
+            }
+            
+             .person.found {
+       
+                
+                border: 1px solid green;
+                background-color: lightgreen;
+               
+            }
+            
+             .face {
+                width: 50px;
+                height: 80px;
+                display: inline-block;
+                border: 1px solid slategrey;
+                font-size: 10px;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    
+    <body data-ng-controller="FaceController as fc">
+        <!-- For output results -->
+        
+ 
+        <!-- Import libraries -->
+       
+ 
+        
+        <h4>{{fc.error}}</h4>
+        
+         <div class='person' data-ng-repeat="face in fc.listfaces" data-ng-click="fc.face = face">
+            <div>{{face.persistedFaceId}}</div>
+            <div data-ng-show="fc.face == face">SELECTED</div>
+        </div>   
+        <div></div>
+        <div class='person' data-ng-class="{found:(fc.foundperson == person.personId)}"data-ng-repeat="person in fc.persons" data-ng-click="fc.person = person">
+            <div>{{person.name}}</div>
+            <div>{{person.personId}}</div>
+            <button data-ng-click="fc.deletePerson(person)">X</button>
+            <div data-ng-show="fc.person == person">SELECTED</div>
+        </div>   
+        <div data-ng-show="fc.person">Faces of {{fc.person.name}}</div>
+        <div class='face' data-ng-repeat="face in fc.person.persistedFaceIds" data-ng-click="fc.face = face; fc.getFace(fc.person.personId,face)">
+            <div>{{face}}</div>
+            <button data-ng-click="fc.deletePersonFace(fc.person,face)">X</button>
+            <div data-ng-show="fc.face == face">SELECTED</div>
+        </div>   
+        
+        <div>
+            <button data-ng-click="fc.createPerson()">Create Person</button> 
+            <input data-ng-model="fc.name" placeholder="Name"/>
+            <button data-ng-disabled="!fc.person" data-ng-click="fc.addFace()">Add Face to person</button>
+            <input data-ng-model="fc.faceUrl" placeholder="URL"/>
+        </div>
+        <div>
+            <button data-ng-click="fc.trainGroup()">Train Group</button>
+        </div>
+        <div>
+            <button data-ng-disabled="!fc.faceUrl" data-ng-click="fc.detectAndCheck()">Check</button>
+            <input data-ng-model="fc.faceUrl" placeholder="URL"/>
+        </div>
+        
+        <pre id="response"></pre>
+    </body>
+</html>
